@@ -1,0 +1,5 @@
+github "Moya/Moya"
+github "ReactiveX/RxSwift" ~> 4.0
+github "mac-cain13/R.swift.Library"
+github "Alamofire/AlamofireImage" ~> 3.4
+
