@@ -9,7 +9,6 @@
 protocol ViewModelProtocol {
     associatedtype Input
     associatedtype Output
-    associatedtype Dependency
 
     func transform(input: Input) -> Output
 }
