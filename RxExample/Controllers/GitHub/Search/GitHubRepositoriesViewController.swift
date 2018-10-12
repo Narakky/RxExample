@@ -10,6 +10,10 @@ import UIKit
 
 final class GitHubRepositoriesViewController: UIViewController {
 
+    // MARK: - Outlets
+
+    @IBOutlet private weak var tableView: UITableView!
+
     // MARK: - Properties
 
     private var viewModel: GitHubSearchRepositoriesViewModel!
@@ -23,7 +27,7 @@ final class GitHubRepositoriesViewController: UIViewController {
     // MARK: - Instantiation
 
     static func instantiate() -> GitHubRepositoriesViewController {
-        let viewController = R.storyboard.main.gitHubRepositoriesViewController()!
+        let viewController = R.storyboard.gitHubRepository.gitHubRepositoriesViewController()!
         viewController.viewModel = GitHubSearchRepositoriesViewModel()
         return viewController
     }
