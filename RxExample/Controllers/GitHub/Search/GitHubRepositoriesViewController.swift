@@ -22,6 +22,9 @@ final class GitHubRepositoriesViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        initTableViewLayout()
+        initTableViewDatasources()
     }
 
     // MARK: - Instantiation
@@ -32,4 +35,17 @@ final class GitHubRepositoriesViewController: UIViewController {
         return viewController
     }
 
+    // MARK: - View Initialization
+
+    private func initTableViewLayout() {
+        tableView.tableFooterView = UIView()
+        tableView.separatorInset = .zero
+        tableView.separatorStyle = .none
+    }
+
+    private func initTableViewDatasources() {
+        
+    }
+
 }
+
