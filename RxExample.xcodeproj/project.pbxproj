@@ -41,6 +41,7 @@
 		048DE6DB21706401009F0CB7 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DE6DA21706401009F0CB7 /* MainTabBarController.swift */; };
 		048DE6DD21706434009F0CB7 /* MainTabBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 048DE6DC21706434009F0CB7 /* MainTabBar.storyboard */; };
 		048DE6E021706D48009F0CB7 /* RxDataSources.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048DE6DF21706D48009F0CB7 /* RxDataSources.framework */; };
+		04B35AF321740B9900928918 /* Differentiator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B35AF221740B9800928918 /* Differentiator.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +93,7 @@
 		048DE6DA21706401009F0CB7 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		048DE6DC21706434009F0CB7 /* MainTabBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainTabBar.storyboard; sourceTree = "<group>"; };
 		048DE6DF21706D48009F0CB7 /* RxDataSources.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxDataSources.framework; path = Carthage/Build/iOS/RxDataSources.framework; sourceTree = "<group>"; };
+		04B35AF221740B9800928918 /* Differentiator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Differentiator.framework; path = Carthage/Build/iOS/Differentiator.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04B35AF321740B9900928918 /* Differentiator.framework in Frameworks */,
 				048DE6E021706D48009F0CB7 /* RxDataSources.framework in Frameworks */,
 				043FBEF7216ED8D50098878D /* Moya.framework in Frameworks */,
 				043FBEF8216ED8D50098878D /* RxSwift.framework in Frameworks */,
@@ -284,6 +287,7 @@
 		043FBEEE216ED8D50098878D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				04B35AF221740B9800928918 /* Differentiator.framework */,
 				048DE6DF21706D48009F0CB7 /* RxDataSources.framework */,
 				043FBF30216F29CF0098878D /* Nimble.framework */,
 				043FBF31216F29CF0098878D /* Quick.framework */,
@@ -560,7 +564,8 @@
 				"$(SRCROOT)/Carthage/Build/iOS/RxMoya.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/Rswift.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/AlamofireImage.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/RxDatasources.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/RxDataSources.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Differentiator.framework",
 			);
 			name = Carthage;
 			outputFileListPaths = (
