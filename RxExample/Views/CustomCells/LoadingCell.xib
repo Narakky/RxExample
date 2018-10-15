@@ -18,7 +18,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="375" height="42.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="3tg-cg-gGj">
+                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="3tg-cg-gGj">
                         <rect key="frame" x="15" y="15" width="345" height="12.5"/>
                     </activityIndicatorView>
                 </subviews>
@@ -31,6 +31,9 @@
                     <constraint firstItem="3tg-cg-gGj" firstAttribute="centerY" secondItem="2t1-6a-Baq" secondAttribute="centerY" id="y5q-BP-bfH"/>
                 </constraints>
             </tableViewCellContentView>
+            <connections>
+                <outlet property="activityIndicator" destination="3tg-cg-gGj" id="uV8-Mu-UB1"/>
+            </connections>
             <point key="canvasLocation" x="138.40000000000001" y="119.1904047976012"/>
         </tableViewCell>
     </objects>

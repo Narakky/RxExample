@@ -24,11 +24,15 @@ struct GitHubSearchParameter: Codable {
     }
 
     let q: Query
+    let page: Int
+    let perPage: Int
     let sort: Sort
     let order: Order
 
-    init(languages: [String]? = nil, topics: [String]? = nil, sort: Sort = .stars, order: Order = .desc) {
+    init(languages: [String]? = nil, topics: [String]? = nil, page: Int, perPage: Int, sort: Sort = .stars, order: Order = .desc) {
         self.q = Query(language: languages ?? ["Swift"], topic: topics)
+        self.page = page
+        self.perPage = perPage
         self.sort = sort
         self.order = order
     }
@@ -37,7 +41,7 @@ struct GitHubSearchParameter: Codable {
         let language = q.language?.compactMap { $0 }.map { "language:\($0)" }.joined(separator: "+")
         let topic = q.topic?.compactMap { $0 }.map { "topic:\($0)" }.joined(separator: "+")
         let query = [language, topic].compactMap { $0 }.joined(separator: "+")
-        return ["q": query, "sort": sort.rawValue, "order": order.rawValue]
+        return ["q": query, "sort": sort.rawValue, "order": order.rawValue, "page": page, "per_page": perPage]
             .map { "\($0.key)=\($0.value)" }
             .joined(separator: "&")
     }

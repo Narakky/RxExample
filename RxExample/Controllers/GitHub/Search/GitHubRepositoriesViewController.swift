@@ -21,11 +21,9 @@ final class GitHubRepositoriesViewController: UIViewController {
 
     private var viewModel: GitHubSearchRepositoriesViewModel!
     private var dataSource: RxTableViewSectionedReloadDataSource<GitHubRepositoriesSectionModel>!
-    private let parameter = GitHubSearchParameter(languages: ["Swift", "Kotlin"],
-                                                  topics: ["iOS", "Android"],
-                                                  sort: .updated,
-                                                  order: .desc)
     private let disposeBag = DisposeBag()
+
+    private var cellHeights: [IndexPath: CGFloat] = [:]
 
     // MARK: - Lifecycle
 
@@ -61,6 +59,7 @@ final class GitHubRepositoriesViewController: UIViewController {
     // MARK: - Private Methods
 
     private func initTableViewLayout() {
+        tableView.rx.setDelegate(self).disposed(by: disposeBag)
         tableView.register(R.nib.gitHubRepositoryItemCell(), forCellReuseIdentifier: R.nib.gitHubRepositoryItemCell.name)
         tableView.register(R.nib.loadingCell(), forCellReuseIdentifier: R.nib.loadingCell.name)
         tableView.tableFooterView = UIView()
@@ -77,7 +76,7 @@ final class GitHubRepositoriesViewController: UIViewController {
     }
 
     private func fetchRepositories() {
-        viewModel.fetchRepositories(parameter: parameter).subscribe(onNext: { [weak self] _ in
+        viewModel.fetchRepositories().subscribe(onNext: { [weak self] _ in
 
             }, onError: { error in
                 print("ERROR: \(error.localizedDescription)")
@@ -86,3 +85,22 @@ final class GitHubRepositoriesViewController: UIViewController {
 
 }
 
+// MARK: - UITableViewDelegate
+
+extension GitHubRepositoriesViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return cellHeights[indexPath] ?? 50
+    }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cellHeights[indexPath] = cell.bounds.height
+
+        if cell is LoadingCell && tableView.indexPathsForVisibleRows?.contains(indexPath) == true {
+            fetchRepositories()
+        }
+    }
+}

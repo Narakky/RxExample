@@ -22,6 +22,9 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
 
     private let useCase: GitHubSearchUseCaseProtocol
     private let items = BehaviorRelay<[GitHubRepositoriesSectionModel]>(value: [])
+    private let isRequesting = BehaviorRelay<Bool>(value: false)
+    private var currentPage = 0
+    private let requestPerPage: Int = 10
 
     // MARK: - Initializer
 
@@ -37,14 +40,49 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
 
     // MARK: - Internal Functions
 
-    func fetchRepositories(parameter: GitHubSearchParameter) -> Observable<Void> {
+    func fetchRepositories() -> Observable<Void> {
+        guard isRequesting.value == false else { return Observable.just(()) }
+
+        isRequesting.accept(true)
+
+        currentPage += 1
+        let parameter = makeRequestParameter(page: currentPage)
         return useCase.invoke(parameter: parameter)
+            .catchError { [weak self] error in
+                self?.isRequesting.accept(false)
+                self?.currentPage -= 1
+                return Observable.empty().asSingle()
+            }
             .flatMap { [weak self] (result) -> Single<Void> in
+                guard let `self` = self else { return Single.just(()) }
+
+                self.isRequesting.accept(false)
+
                 let sectionModels: [GitHubRepositoriesSectionModel] = [.repositoryItemSection(items: result.items),
                                                                        .loadingSection(items: [NSObject()])]
-                self?.items.accept(sectionModels)
+
+                let updatedSectionModels = self.items.value.filter {
+                    switch $0 {
+                    case .repositoryItemSection(_):
+                        return true
+                    default:
+                        return false
+                    }
+                    } + sectionModels
+                self.items.accept(updatedSectionModels)
                 return Single.just(())
             }.asObservable()
+    }
+
+    // MARK: - Private Methods
+
+    private func makeRequestParameter(page: Int) -> GitHubSearchParameter {
+        return GitHubSearchParameter(languages: ["Swift", "Kotlin"],
+                                     topics: ["iOS", "Android"],
+                                     page: page,
+                                     perPage: requestPerPage,
+                                     sort: .updated,
+                                     order: .desc)
     }
 
 }
