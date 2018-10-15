@@ -15,7 +15,7 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
 
     }
     struct Output {
-        var items: Driver<[GitHubRepositoriesSectionModel]>
+        var items: Observable<[GitHubRepositoriesSectionModel]>
     }
 
     // MARK: - Properties
@@ -32,7 +32,7 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
     // MARK: - Transform Input To Output
 
     func transform(input: GitHubSearchRepositoriesViewModel.Input) -> GitHubSearchRepositoriesViewModel.Output {
-        return Output(items: items.asDriver())
+        return Output(items: items.asObservable())
     }
 
     // MARK: - Internal Functions
@@ -40,7 +40,7 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
     func fetchRepositories(parameter: GitHubSearchParameter) -> Observable<Void> {
         return useCase.invoke(parameter: parameter)
             .flatMap { [weak self] (result) -> Single<Void> in
-                let itemSectionModel = GitHubRepositoriesSectionModel(section: .item, items: result.items)
+                let itemSectionModel = GitHubRepositoriesSectionModel(model: .item, items: result.items)
                 self?.items.accept([itemSectionModel])
                 return Single.just(())
             }.asObservable()

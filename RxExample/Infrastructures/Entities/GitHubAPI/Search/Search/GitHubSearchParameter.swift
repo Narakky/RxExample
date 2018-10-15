@@ -27,10 +27,10 @@ struct GitHubSearchParameter: Codable {
     let sort: Sort
     let order: Order
 
-    init(q: Query?=nil, sort: Sort?=nil, order: Order?=nil) {
-        self.q = q ?? Query(language: ["swift"], topic: nil)
-        self.sort = sort ?? .updated
-        self.order = order ?? .desc
+    init(languages: [String]? = nil, topics: [String]? = nil, sort: Sort = .stars, order: Order = .desc) {
+        self.q = Query(language: languages ?? ["Swift"], topic: topics)
+        self.sort = sort
+        self.order = order
     }
 
     var queryString: String {

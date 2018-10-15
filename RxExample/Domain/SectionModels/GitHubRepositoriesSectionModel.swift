@@ -9,22 +9,9 @@
 import UIKit
 import RxDataSources
 
+typealias GitHubRepositoriesSectionModel = SectionModel<GitHubRepositoriesSection, GitHubSearchItem>
+
 enum GitHubRepositoriesSection {
     case item
-}
-
-struct GitHubRepositoriesSectionModel: SectionModelType {
-    typealias Item = GitHubSearchItem
-    let section: GitHubRepositoriesSection
-    var items: [GitHubSearchItem]
-
-    init(section: GitHubRepositoriesSection, items: [Item]) {
-        self.section = section
-        self.items = items
-    }
-
-    init(original: GitHubRepositoriesSectionModel, items: [Item]) {
-        self = original
-        self.items = items
-    }
+    case common
 }

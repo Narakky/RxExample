@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import RxDataSources
 
 final class GitHubRepositoriesViewController: UIViewController {
 
@@ -17,6 +20,12 @@ final class GitHubRepositoriesViewController: UIViewController {
     // MARK: - Properties
 
     private var viewModel: GitHubSearchRepositoriesViewModel!
+    private var dataSource: RxTableViewSectionedReloadDataSource<GitHubRepositoriesSectionModel>!
+    private let parameter = GitHubSearchParameter(languages: ["Swift", "Kotlin"],
+                                                  topics: ["iOS", "Android"],
+                                                  sort: .updated,
+                                                  order: .desc)
+    private let disposeBag = DisposeBag()
 
     // MARK: - Lifecycle
 
@@ -24,7 +33,8 @@ final class GitHubRepositoriesViewController: UIViewController {
         super.viewDidLoad()
 
         initTableViewLayout()
-        initTableViewDatasources()
+        bindViewModel()
+        fetchRepositories()
     }
 
     // MARK: - Instantiation
@@ -32,19 +42,43 @@ final class GitHubRepositoriesViewController: UIViewController {
     static func instantiate() -> GitHubRepositoriesViewController {
         let viewController = R.storyboard.gitHubRepository.gitHubRepositoriesViewController()!
         viewController.viewModel = GitHubSearchRepositoriesViewModel()
+        viewController.dataSource = RxTableViewSectionedReloadDataSource<GitHubRepositoriesSectionModel>(configureCell: { (dataSource, tableView, indexPath, item) -> UITableViewCell in
+            let model = dataSource[indexPath.section]
+            switch model.model {
+            case .item:
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: R.nib.gitHubRepositoryItemCell.name, for: indexPath) as? GitHubRepositoryItemCell else { return UITableViewCell() }
+                cell.configure(item: item)
+                return cell
+            default:
+                return UITableViewCell()
+            }
+        })
         return viewController
     }
 
-    // MARK: - View Initialization
+    // MARK: - Private Methods
 
     private func initTableViewLayout() {
+        tableView.register(R.nib.gitHubRepositoryItemCell(), forCellReuseIdentifier: R.nib.gitHubRepositoryItemCell.name)
         tableView.tableFooterView = UIView()
         tableView.separatorInset = .zero
-        tableView.separatorStyle = .none
     }
 
-    private func initTableViewDatasources() {
-        
+    private func bindViewModel() {
+        let input = GitHubSearchRepositoriesViewModel.Input()
+        let output = viewModel.transform(input: input)
+
+        output.items
+            .bind(to: tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+    }
+
+    private func fetchRepositories() {
+        viewModel.fetchRepositories(parameter: parameter).subscribe(onNext: { [weak self] _ in
+
+            }, onError: { error in
+                print("ERROR: \(error.localizedDescription)")
+        }).disposed(by: disposeBag)
     }
 
 }
