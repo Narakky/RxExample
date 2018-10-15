@@ -40,8 +40,9 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
     func fetchRepositories(parameter: GitHubSearchParameter) -> Observable<Void> {
         return useCase.invoke(parameter: parameter)
             .flatMap { [weak self] (result) -> Single<Void> in
-                let itemSectionModel = GitHubRepositoriesSectionModel(model: .item, items: result.items)
-                self?.items.accept([itemSectionModel])
+                let sectionModels: [GitHubRepositoriesSectionModel] = [.repositoryItemSection(items: result.items),
+                                                                       .loadingSection(items: [NSObject()])]
+                self?.items.accept(sectionModels)
                 return Single.just(())
             }.asObservable()
     }

@@ -9,9 +9,24 @@
 import UIKit
 import RxDataSources
 
-typealias GitHubRepositoriesSectionModel = SectionModel<GitHubRepositoriesSection, GitHubSearchItem>
+enum GitHubRepositoriesSectionModel {
+    case repositoryItemSection(items: [GitHubSearchItem])
+    case loadingSection(items: [NSObject])
+}
 
-enum GitHubRepositoriesSection {
-    case item
-    case common
+extension GitHubRepositoriesSectionModel: SectionModelType {
+    typealias Item = Any
+
+    var items: [Item] {
+        switch self {
+        case .repositoryItemSection(items: let items):
+            return items
+        case .loadingSection(items: let items):
+            return items
+        }
+    }
+
+    init(original: GitHubRepositoriesSectionModel, items: [Any]) {
+        self = original
+    }
 }

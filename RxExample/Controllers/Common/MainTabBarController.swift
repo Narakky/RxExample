@@ -10,14 +10,22 @@ import UIKit
 
 final class MainTabBarController: UITabBarController {
 
+    // MARK: - Properties
+
+    let tabBarIcons: [UIImage?] = [R.image.iconGithub()]
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.delegate = self
+        tabBar.tintColor = UIColor.darkGray
 
         viewControllers = [GitHubRepositoriesViewController.instantiate()]
+        viewControllers?.enumerated().forEach { (index, viewController) in
+            viewController.tabBarItem.image = tabBarIcons[index]
+        }
         self.title = viewControllers?.first?.tabBarItem.title
     }
 

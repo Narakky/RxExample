@@ -42,15 +42,17 @@ final class GitHubRepositoriesViewController: UIViewController {
     static func instantiate() -> GitHubRepositoriesViewController {
         let viewController = R.storyboard.gitHubRepository.gitHubRepositoriesViewController()!
         viewController.viewModel = GitHubSearchRepositoriesViewModel()
-        viewController.dataSource = RxTableViewSectionedReloadDataSource<GitHubRepositoriesSectionModel>(configureCell: { (dataSource, tableView, indexPath, item) -> UITableViewCell in
+        viewController.dataSource = RxTableViewSectionedReloadDataSource<GitHubRepositoriesSectionModel>(configureCell: { (dataSource, tableView, indexPath, _) -> UITableViewCell in
             let model = dataSource[indexPath.section]
-            switch model.model {
-            case .item:
+            switch model {
+            case .repositoryItemSection(items: let items):
+                let item = items[indexPath.row]
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: R.nib.gitHubRepositoryItemCell.name, for: indexPath) as? GitHubRepositoryItemCell else { return UITableViewCell() }
                 cell.configure(item: item)
                 return cell
-            default:
-                return UITableViewCell()
+            case .loadingSection(items: _):
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: R.nib.loadingCell.name, for: indexPath) as? LoadingCell else { return UITableViewCell() }
+                return cell
             }
         })
         return viewController
@@ -60,6 +62,7 @@ final class GitHubRepositoriesViewController: UIViewController {
 
     private func initTableViewLayout() {
         tableView.register(R.nib.gitHubRepositoryItemCell(), forCellReuseIdentifier: R.nib.gitHubRepositoryItemCell.name)
+        tableView.register(R.nib.loadingCell(), forCellReuseIdentifier: R.nib.loadingCell.name)
         tableView.tableFooterView = UIView()
         tableView.separatorInset = .zero
     }
