@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxDataSources
 
 struct GitHubSearchItem: Codable {
     let id: Int
