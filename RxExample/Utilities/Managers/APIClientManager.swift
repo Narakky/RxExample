@@ -22,13 +22,6 @@ class APIClientManager {
     func request<T>(_ request: T) -> Single<T.Response> where T: APITargetType {
         let target = MultiTarget(request)
 
-        /*
-         let rxProvider = MoyaProvider<MultiTarget>(endpointClosure: { (target: MultiTarget) -> Endpoint in
-         let url = target.baseURL.absoluteString.appending(target.path)
-         return Endpoint(url: url, sampleResponseClosure: { .networkResponse(200, target.sampleData) }, method: target.method, task: target.task, httpHeaderFields: target.headers)
-         })
-         */
-
         return provider.rx.request(target)
             .filterSuccessfulStatusAndRedirectCodes()
             .map { decodableData in
