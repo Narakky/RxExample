@@ -23,6 +23,7 @@ final class GitHubRepositoriesViewController: UIViewController {
     private var dataSource: RxTableViewSectionedReloadDataSource<GitHubRepositoriesSectionModel>!
     private let disposeBag = DisposeBag()
 
+    private let refreshControl = UIRefreshControl()
     private var cellHeights: [IndexPath: CGFloat] = [:]
 
     // MARK: - Lifecycle
@@ -64,15 +65,23 @@ final class GitHubRepositoriesViewController: UIViewController {
         tableView.register(R.nib.loadingCell(), forCellReuseIdentifier: R.nib.loadingCell.name)
         tableView.tableFooterView = UIView()
         tableView.separatorInset = .zero
+        tableView.refreshControl = self.refreshControl
     }
 
     private func bindViewModel() {
-        let input = GitHubSearchRepositoriesViewModel.Input()
+        let refreshControlShouldRefresh = refreshControl.rx.controlEvent(.valueChanged)
+            .filter { self.refreshControl.isRefreshing }
+            .asSignal(onErrorJustReturn: ())
+        let input = GitHubSearchRepositoriesViewModel.Input(shouldRefresh: refreshControlShouldRefresh)
         let output = viewModel.transform(input: input)
 
         output.items
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+
+        output.hasFinishedForRefreshing.emit(onNext: { [weak self] in
+            self?.fetchRepositories()
+        }).disposed(by: disposeBag)
     }
 
     private func fetchRepositories() {
@@ -80,6 +89,8 @@ final class GitHubRepositoriesViewController: UIViewController {
 
             }, onError: { error in
                 print("ERROR: \(error.localizedDescription)")
+        }, onCompleted: { [weak self] in
+            self?.refreshControl.endRefreshing()
         }).disposed(by: disposeBag)
     }
 

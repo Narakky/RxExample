@@ -12,10 +12,11 @@ import RxDataSources
 
 final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
     struct Input {
-
+        var shouldRefresh: Signal<Void>
     }
     struct Output {
         var items: Observable<[GitHubRepositoriesSectionModel]>
+        var hasFinishedForRefreshing: Signal<Void>
     }
 
     // MARK: - Properties
@@ -23,8 +24,12 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
     private let useCase: GitHubSearchUseCaseProtocol
     private let items = BehaviorRelay<[GitHubRepositoriesSectionModel]>(value: [])
     private let isRequesting = BehaviorRelay<Bool>(value: false)
+    private let hasFinishedForRefreshing = PublishRelay<Void>()
     private var currentPage = 0
     private let requestPerPage: Int = 10
+    private var hasItems = true
+    private var shouldRefresh = false
+    private let disposeBag = DisposeBag()
 
     // MARK: - Initializer
 
@@ -35,13 +40,21 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
     // MARK: - Transform Input To Output
 
     func transform(input: GitHubSearchRepositoriesViewModel.Input) -> GitHubSearchRepositoriesViewModel.Output {
-        return Output(items: items.asObservable())
+        input.shouldRefresh.emit(onNext: { [weak self] _ in
+            self?.hasItems = true
+            self?.shouldRefresh = true
+            self?.currentPage = 0
+            self?.hasFinishedForRefreshing.accept(())
+        }).disposed(by: disposeBag)
+
+        return Output(items: items.asObservable(),
+                      hasFinishedForRefreshing: hasFinishedForRefreshing.asSignal())
     }
 
     // MARK: - Internal Functions
 
     func fetchRepositories() -> Observable<Void> {
-        guard isRequesting.value == false else { return Observable.just(()) }
+        guard isRequesting.value == false, hasItems == true else { return Observable.just(()) }
 
         isRequesting.accept(true)
 
@@ -57,19 +70,30 @@ final class GitHubSearchRepositoriesViewModel: ViewModelProtocol {
                 guard let `self` = self else { return Single.just(()) }
 
                 self.isRequesting.accept(false)
+                if result.items.isEmpty {
+                    self.hasItems = false
+                }
 
-                let sectionModels: [GitHubRepositoriesSectionModel] = [.repositoryItemSection(items: result.items),
-                                                                       .loadingSection(items: [NSObject()])]
-
-                let updatedSectionModels = self.items.value.filter {
-                    switch $0 {
-                    case .repositoryItemSection(_):
-                        return true
-                    default:
-                        return false
+                var sectionModels: [GitHubRepositoriesSectionModel] = [.repositoryItemSection(items: result.items)]
+                if !result.items.isEmpty {
+                    sectionModels.append(.loadingSection(items: [NSObject()]))
+                }
+                var updatedSectionModels: [GitHubRepositoriesSectionModel] = []
+                if !self.shouldRefresh {
+                    updatedSectionModels += self.items.value.filter {
+                        switch $0 {
+                        case .repositoryItemSection(_):
+                            return true
+                        default:
+                            return false
+                        }
                     }
-                    } + sectionModels
+                }
+                updatedSectionModels += sectionModels
                 self.items.accept(updatedSectionModels)
+
+                self.shouldRefresh = false
+
                 return Single.just(())
             }.asObservable()
     }
